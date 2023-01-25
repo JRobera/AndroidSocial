@@ -25,12 +25,30 @@ public class LoginActivity extends AppCompatActivity {
     private EditText login_email, login_password;
     private Button login;
     private TextView create_account;
+    private static String user_id;
+    private static String user_name;
+    private static Integer user_image;
+    private static String email;
+
+//TODO: used to pass user_id globaliy
+    public static String getUser_id() { return user_id; }
+
+    public static String getUser_name() { return user_name; }
+
+    public static Integer getUser_image() { return user_image; }
+
+    public static String getEmail() { return email; }
 
     private static final String SHARED_PREFS =  "sharedPrefs";
     private static final String EMAIL = "email";
     private static final String PASSWORD = "password";
+    private static final String ID ="id";
+    private static final String USER_NAME = "user_name";
+    private static final String USER_IMAGE = "we";
+    private static final String UEMAIL = "uemail";
 
-    private String saved_email, saved_password;
+    private String saved_email, saved_password, saved_id, saved_name, saved_uemail;
+    private Integer saved_image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +86,11 @@ public class LoginActivity extends AppCompatActivity {
 
     loadData();
     updateViews();
+    checkUser();
 
     }
     public void checkUser(){
-        Call<List<UserModel>> call = jsonData.getUsers();
+        Call<List<UserModel>> call = jsonData.getUsers(login_email.getText().toString());
         call.enqueue(new Callback<List<UserModel>>() {
             @Override
             public void onResponse(Call<List<UserModel>> call, Response<List<UserModel>> response) {
@@ -81,6 +100,11 @@ public class LoginActivity extends AppCompatActivity {
                 List<UserModel> users = response.body();
 
                 for(UserModel user : users){
+                    user_id = user.get_id();
+                    user_name = user.getUser_name();
+                    user_image = user.getUser_image();
+                    email = user.getUser_email();
+
                     if(!Patterns.EMAIL_ADDRESS.matcher(login_email.getText().toString()).matches()){
                         Toast.makeText(LoginActivity.this, "Invalid Email", Toast.LENGTH_SHORT).show();
                     }else{
@@ -109,6 +133,10 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(EMAIL, login_email.getText().toString());
         editor.putString(PASSWORD, login_password.getText().toString());
+        editor.putString(ID, user_id );
+        editor.putString(USER_NAME, user_name);
+        editor.putInt("we",user_image);
+        editor.putString(UEMAIL, email);
         editor.apply();
         Toast.makeText(this, "Data saved", Toast.LENGTH_SHORT).show();
     }
@@ -116,10 +144,17 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         saved_email= sharedPreferences.getString(EMAIL,"");
         saved_password = sharedPreferences.getString(PASSWORD, "");
+        saved_id = sharedPreferences.getString(ID,"");
+        saved_name = sharedPreferences.getString(USER_NAME, "");
+        saved_image = sharedPreferences.getInt(USER_IMAGE,0);
+        saved_uemail = sharedPreferences.getString(UEMAIL, "");
     }
     public void updateViews(){
         login_email.setText(saved_email);
         login_password.setText(saved_password);
-        checkUser();
+        user_id = saved_id;
+        user_name = saved_name;
+        user_image = saved_image;
+        email = saved_uemail;
     }
 }

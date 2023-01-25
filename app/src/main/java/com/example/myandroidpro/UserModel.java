@@ -1,7 +1,9 @@
 package com.example.myandroidpro;
 
 public class UserModel {
+    private String _id;
     private String user_name;
+    private Integer user_image;
     private String email;
     private String password;
 
@@ -11,6 +13,10 @@ public class UserModel {
         this.password = password;
     }
 
+    public String get_id() { return _id; }
+
+    public void set_id(String _id) { this._id = _id; }
+
     public String getUser_name() {
         return user_name;
     }
@@ -18,6 +24,8 @@ public class UserModel {
     public void setUser_name(String user_name) {
         this.user_name = user_name;
     }
+
+    public Integer getUser_image() { return user_image; }
 
     public String getUser_email() {
         return email;

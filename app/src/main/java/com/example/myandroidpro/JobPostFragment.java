@@ -1,21 +1,20 @@
 package com.example.myandroidpro;
 
-import android.content.Intent;
+import static android.text.TextUtils.isEmpty;
+
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -26,30 +25,33 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PostFragment extends Fragment {
-BottomNavigationView post_type, bottomNavigationView;
-private JsonData jsonData;
-private EditText ed_title, ed_post;
-private Button btn_post;
+public class JobPostFragment extends Fragment {
+    BottomNavigationView post_type, bottomNavigationView;
 
-    public PostFragment() {
+    private JsonData jsonData;
+    private EditText job_title, job_description, job_requirements, job_salary, job_location;
+    private Button btn_post_job;
+
+    public JobPostFragment() {
         // Required empty public constructor
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ed_title = view.findViewById(R.id.ed_title);
-        ed_post = view.findViewById(R.id.ed_post);
-        ed_post.setVerticalScrollBarEnabled(true);
-        ed_post.setScrollbarFadingEnabled(true);
-        btn_post = view.findViewById(R.id.btn_post);
+        job_title = view.findViewById(R.id.job_title);
+        job_description = view.findViewById(R.id.job_description);
+        job_description.setVerticalScrollBarEnabled(true);
+        job_description.setScrollbarFadingEnabled(true);
+        job_requirements = view.findViewById(R.id.job_requirements);
+        job_salary = view.findViewById(R.id.job_salary);
+        job_location = view.findViewById(R.id.job_location);
+        btn_post_job = view.findViewById(R.id.btn_post_job);
 
         bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
 
-
         post_type = view.findViewById(R.id.postbottomNavigationView);
-        post_type.setSelectedItemId(R.id.rpost);
+        post_type.setSelectedItemId(R.id.job_post);
         post_type.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -78,39 +80,46 @@ private Button btn_post;
                 .build();
         jsonData = retrofit.create(JsonData.class);
 
-
-        btn_post.setOnClickListener(new View.OnClickListener() {
+        btn_post_job.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Call<PostModel> call= jsonData.createPost(ed_title.getText().toString(),ed_post.getText().toString(),LoginActivity.getUser_id());
-                call.enqueue(new Callback<PostModel>() {
+                if(!isEmpty(job_title.getText()) && !isEmpty(job_description.getText()) && !isEmpty(job_requirements.getText())){
+
+                Call<JobModel> call = jsonData.createJobPost(job_title.getText().toString(),job_description.getText().toString(),job_requirements.getText().toString(),job_salary.getText().toString(),job_location.getText().toString());
+                call.enqueue(new Callback<JobModel>() {
                     @Override
-                    public void onResponse(Call<PostModel> call, Response<PostModel> response) {
+                    public void onResponse(Call<JobModel> call, Response<JobModel> response) {
                         if(!response.isSuccessful()){
                             return;
                         }
                     }
                     @Override
-                    public void onFailure(Call<PostModel> call, Throwable t) { }
+                    public void onFailure(Call<JobModel> call, Throwable t) {
+
+                    }
                 });
-                ed_title.setText("");
-                ed_post.setText("");
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container, new HomeFragment());
-                fragmentTransaction.commit();
+            }
+                job_title.setText("");
+                job_description.setText("");
+                job_requirements.setText("");
+                job_salary.setText("");
+                job_location.setText("");
+                FragmentManager fragmentManager1 = getFragmentManager();
+                FragmentTransaction fragmentTransaction1 = fragmentManager1.beginTransaction();
+                fragmentTransaction1.replace(R.id.container, new JobFragment());
+                fragmentTransaction1.commit();
 //                bottomNavigationView.setSelectedItemId(R.id.job);
+
 
             }
         });
 
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_post, container, false);
+        return inflater.inflate(R.layout.fragment_job_post, container, false);
     }
 }

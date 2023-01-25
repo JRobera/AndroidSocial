@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,49 +21,65 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class JobFragment extends Fragment {
+public class SearchFragment extends Fragment {
+private RecyclerView searchRV;
 private JsonData jsonData;
-RecyclerView jobRV;
-    public JobFragment() {
+private String searchquery;
+
+    public SearchFragment() {
         // Required empty public constructor
+    }
+    public SearchFragment(String query) {
+        this.searchquery = query;
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        jobRV = view.findViewById(R.id.RVJob);
+        searchRV = view.findViewById(R.id.idRVPost);
 
-        ArrayList<JobModel> jobModelArrayList = new ArrayList<>();
+        ArrayList<PostModel> modelArrayList = new ArrayList<>();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:4000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
         jsonData = retrofit.create(JsonData.class);
-        JobAdapter jobAdapter = new JobAdapter(this.getContext(),jobModelArrayList);
+        PostAdapter searchAdapter = new PostAdapter(this.getContext(), modelArrayList);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
 
-        Call<List<JobModel>> call = jsonData.getJobs();
-        call.enqueue(new Callback<List<JobModel>>() {
+        Call<List<PostModel>> call =  jsonData.searchPost(searchquery);
+        call.enqueue(new Callback<List<PostModel>>() {
             @Override
-            public void onResponse(Call<List<JobModel>> call, Response<List<JobModel>> response) {
+            public void onResponse(Call<List<PostModel>> call, Response<List<PostModel>> response) {
                 if(!response.isSuccessful()){
                     return;
                 }
-                List<JobModel> jobs = response.body();
-                for(JobModel job: jobs){
-                    jobModelArrayList.add(new JobModel(job.getTitle(),job.getDescription(),job.getRequirements(),job.getSalary(),job.getLocation(),job.getPosted_date()));
+
+                List<PostModel> posts = response.body();
+                for(PostModel post : posts){
+                    modelArrayList.add(new PostModel(post.get_id(), post.getAuthor(), post.getTitle(), post.getBody(),post.getLikes()));
                 }
-                jobRV.setLayoutManager(linearLayoutManager);
-                jobRV.setAdapter(jobAdapter);
+
+
+                searchRV.setLayoutManager(linearLayoutManager);
+                searchRV.setAdapter(searchAdapter);
+
             }
 
             @Override
-            public void onFailure(Call<List<JobModel>> call, Throwable t) {
+            public void onFailure(Call<List<PostModel>> call, Throwable t) {
 
             }
         });
+
 
     }
 
@@ -72,6 +87,6 @@ RecyclerView jobRV;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_job, container, false);
+        return inflater.inflate(R.layout.fragment_search, container, false);
     }
 }

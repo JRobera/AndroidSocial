@@ -69,7 +69,7 @@ public class HomeFragment extends Fragment {
                 List<PostModel> posts = response.body();
 
                 for(PostModel post : posts){
-                    postModelArrayList.add(new PostModel(post.getAuthor(), post.getTitle(), post.getBody(),post.getLikes()));
+                    postModelArrayList.add(new PostModel(post.get_id(), post.getAuthor(), post.getTitle(), post.getBody(),post.getLikes()));
                 }
 
                 // in below two lines we are setting layoutmanager and adapter to our recycler view.

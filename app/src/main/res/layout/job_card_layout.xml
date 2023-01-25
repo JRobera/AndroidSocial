@@ -4,16 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="#EAF4F4"
     app:cardCornerRadius="8dp"
-    app:cardElevation="8dp"
+    app:cardElevation="3dp"
     app:cardMaxElevation="10dp"
     app:cardPreventCornerOverlap="true"
     app:cardUseCompatPadding="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="5dp">
 
         <TextView
             android:id="@+id/job_title"

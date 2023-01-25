@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 //        postRV.setLayoutManager(linearLayoutManager);
 //        postRV.setAdapter(postAdapter);
 
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.home);
@@ -130,18 +131,28 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         inflater.inflate(R.menu.search_menu,menu);
 
         MenuItem menuItem = menu.findItem(R.id.action_search);
+        menuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                return true;
+            }
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, new HomeFragment()).commit();
+                return true;
+            }
+        });
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setQueryHint("Type here to search");
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, new SearchFragment(s)).commit();
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String s) {
-                Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
