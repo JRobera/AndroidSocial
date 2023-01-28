@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,6 +50,24 @@ public class JobAdapter extends RecyclerView.Adapter<JobAdapter.JobViewHolder> {
     public void onBindViewHolder(@NonNull JobAdapter.JobViewHolder holder, int position) {
         JobModel model = jobModelArrayList.get(position);
         holder.job_post_id.setText(model.get_id());
+        Call<List<UserModel>> call = jsonData.getUserById(model.getAuthor());
+        call.enqueue(new Callback<List<UserModel>>() {
+            @Override
+            public void onResponse(Call<List<UserModel>> call, Response<List<UserModel>> response) {
+                if (!response.isSuccessful()){return;}
+
+                List<UserModel> users = response.body();
+                for(UserModel user : users){
+                    holder.users_name.setText(user.getUser_name());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<UserModel>> call, Throwable t) {
+                Toast.makeText(context.getApplicationContext(), "failed to get username", Toast.LENGTH_SHORT).show();
+            }
+
+        });
         holder.job_title.setText("Job Title: "+model.getTitle());
         holder.job_description.setText("Job Description: "+model.getDescription());
         holder.job_requirements.setText("Job Requirements: "+model.getRequirements());
@@ -66,11 +85,12 @@ public class JobAdapter extends RecyclerView.Adapter<JobAdapter.JobViewHolder> {
     }
 
     public static class JobViewHolder extends RecyclerView.ViewHolder {
-        private final TextView job_post_id, job_title, job_description, job_requirements, job_salary, job_location, job_posted_date;
+        private final TextView job_post_id, users_name, job_title, job_description, job_requirements, job_salary, job_location, job_posted_date;
         private final ImageView delete_job;
         public JobViewHolder(@NonNull View itemView) {
             super(itemView);
             job_post_id = itemView.findViewById(R.id.job_post_id);
+            users_name = itemView.findViewById(R.id.users_name);
             job_title = itemView.findViewById(R.id.job_title);
             job_description = itemView.findViewById(R.id.job_description);
             job_requirements = itemView.findViewById(R.id.job_requirements);
@@ -112,6 +132,8 @@ public class JobAdapter extends RecyclerView.Adapter<JobAdapter.JobViewHolder> {
 
                 }
             });
+
+
         }
     }
 

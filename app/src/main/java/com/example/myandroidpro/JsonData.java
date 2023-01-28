@@ -41,8 +41,11 @@ public interface JsonData {
     Call<List<CommentModel>> getComments();
 
 
-    @GET("/search")
+    @GET("/search-post")
     Call<List<PostModel>> searchPost(@Query("title")String title);
+
+    @GET("/search-job")
+    Call<List<JobModel>> searchJob(@Query("title")String title);
 
     @GET("job")
     Call<List<JobModel>> getJobs();
