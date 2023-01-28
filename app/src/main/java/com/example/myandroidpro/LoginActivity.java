@@ -1,5 +1,6 @@
 package com.example.myandroidpro;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -22,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
     private JsonData jsonData;
-    private EditText login_email, login_password;
+    private static EditText login_email, login_password;
     private Button login;
     private TextView create_account;
     private static String user_id;
@@ -33,11 +34,17 @@ public class LoginActivity extends AppCompatActivity {
 //TODO: used to pass user_id globaliy
     public static String getUser_id() { return user_id; }
 
+    public static void setUser_id(String user_id) { LoginActivity.user_id = user_id;}
+
     public static String getUser_name() { return user_name; }
+
+    public static void setUser_name(String user_name) { LoginActivity.user_name = user_name; }
 
     public static Integer getUser_image() { return user_image; }
 
     public static String getEmail() { return email; }
+
+    public static void setEmail(String email) { LoginActivity.email = email; }
 
     private static final String SHARED_PREFS =  "sharedPrefs";
     private static final String EMAIL = "email";
@@ -47,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String USER_IMAGE = "we";
     private static final String UEMAIL = "uemail";
 
-    private String saved_email, saved_password, saved_id, saved_name, saved_uemail;
+    private static String saved_email, saved_password, saved_id, saved_name, saved_uemail;
     private Integer saved_image;
 
     @Override
@@ -70,9 +77,13 @@ public class LoginActivity extends AppCompatActivity {
     login.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            checkUser();
-            // save user preferences
-            saveData();
+            if(login_email.getText().toString() != null && login_password.getText().toString() != null){
+                if(!Patterns.EMAIL_ADDRESS.matcher(login_email.getText().toString()).matches()){
+                    Toast.makeText(LoginActivity.this, "Invalid Email", Toast.LENGTH_SHORT).show();
+                }else {
+                    checkUser();
+                }
+            }
         }
     });
 
@@ -84,9 +95,13 @@ public class LoginActivity extends AppCompatActivity {
         }
     });
 
+
     loadData();
     updateViews();
-    checkUser();
+    if(login_email.getText().toString() != null && login_password.getText().toString() != null){
+            checkUser();
+        }
+
 
     }
     public void checkUser(){
@@ -105,18 +120,19 @@ public class LoginActivity extends AppCompatActivity {
                     user_image = user.getUser_image();
                     email = user.getUser_email();
 
-                    if(!Patterns.EMAIL_ADDRESS.matcher(login_email.getText().toString()).matches()){
-                        Toast.makeText(LoginActivity.this, "Invalid Email", Toast.LENGTH_SHORT).show();
-                    }else{
-                        if(login_email.getText().toString().equals(user.getUser_email()) && login_password.getText().toString().equals(user.getPassword())){
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                            break;
+                        if(login_email.getText().toString().equals(user.getUser_email())){
+                            if(login_password.getText().toString().equals(user.getPassword())){
+                                // save user preferences
+                                saveData();
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }else{
+                                Toast.makeText(LoginActivity.this, "Incorrect password!", Toast.LENGTH_SHORT).show();
+                            }
                         }else {
                             Toast.makeText(LoginActivity.this, "User does not exist "+login_email.getText().toString(), Toast.LENGTH_SHORT).show();
                         }
-                    }
                 }
             }
 
@@ -157,4 +173,17 @@ public class LoginActivity extends AppCompatActivity {
         user_image = saved_image;
         email = saved_uemail;
     }
+
+// TODO::Log out
+    public static void logOut(){
+         LoginActivity.clear();
+    }
+    public static void clear(){
+        SharedPreferences sharedPreferences = login_email.getContext().getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
+
+
 }

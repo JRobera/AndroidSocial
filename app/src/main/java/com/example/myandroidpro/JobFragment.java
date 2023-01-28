@@ -54,7 +54,7 @@ RecyclerView jobRV;
                 }
                 List<JobModel> jobs = response.body();
                 for(JobModel job: jobs){
-                    jobModelArrayList.add(new JobModel(job.getTitle(),job.getDescription(),job.getRequirements(),job.getSalary(),job.getLocation(),job.getPosted_date()));
+                    jobModelArrayList.add(new JobModel(job.get_id(),job.getAuthor(),job.getTitle(),job.getDescription(),job.getRequirements(),job.getSalary(),job.getLocation(),job.getPosted_date()));
                 }
                 jobRV.setLayoutManager(linearLayoutManager);
                 jobRV.setAdapter(jobAdapter);
@@ -62,7 +62,7 @@ RecyclerView jobRV;
 
             @Override
             public void onFailure(Call<List<JobModel>> call, Throwable t) {
-
+                Toast.makeText(getContext(), "Job posts failure", Toast.LENGTH_SHORT).show();
             }
         });
 

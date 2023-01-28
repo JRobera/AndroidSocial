@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -50,6 +52,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         if(!response.isSuccessful()){
                             return;
                         }
+
                         Toast.makeText(RegistrationActivity.this, String.valueOf(response), Toast.LENGTH_SHORT).show();
                     }
                     @Override
@@ -57,6 +60,41 @@ public class RegistrationActivity extends AppCompatActivity {
 
                     }
                 });
+                    Toast.makeText(RegistrationActivity.this, "user login", Toast.LENGTH_SHORT).show();
+
+                Call<List<UserModel>> calls = jsonData.getUsers(signup_email.getText().toString());
+                calls.enqueue(new Callback<List<UserModel>>() {
+                        @Override
+                        public void onResponse(Call<List<UserModel>> call, Response<List<UserModel>> response) {
+                            if(!response.isSuccessful()){
+                                return;
+                            }
+                            List<UserModel> users = response.body();
+                            for(UserModel user : users){
+                                LoginActivity.setUser_id(user.get_id());
+                                LoginActivity.setUser_name(user.getUser_name());
+                                LoginActivity.setEmail(user.getUser_email());
+                                if(signup_email.getText().toString().equals(user.getUser_email())){
+                                    if(signup_password.getText().toString().equals(user.getPassword())){
+                                        // save user preferences
+//                                    saveData();
+                                        Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }else{
+                                        Toast.makeText(RegistrationActivity.this, "Incorrect password!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }else {
+                                    Toast.makeText(RegistrationActivity.this, "User does not exist "+signup_email.getText().toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<UserModel>> call, Throwable t) {
+                            Toast.makeText(RegistrationActivity.this, "Failure", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();

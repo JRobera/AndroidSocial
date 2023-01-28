@@ -1,6 +1,8 @@
 package com.example.myandroidpro;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -58,14 +62,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
                 List<UserModel> users = response.body();
                 for(UserModel user : users){
-                    Toast.makeText(context.getApplicationContext(), "get", Toast.LENGTH_SHORT).show();
                     holder.user_name.setText(user.getUser_name());
                 }
             }
 
             @Override
             public void onFailure(Call<List<UserModel>> call, Throwable t) {
-                Toast.makeText(context.getApplicationContext(), "failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context.getApplicationContext(), "failed to get username", Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -74,6 +77,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.post.setText(model.getBody());
         holder.likes_count.setText(String.valueOf(model.getLikes()));
 //        holder.comment_count.setText(String.valueOf(model.getBody()));
+        if(model.getAuthor().equals(LoginActivity.getUser_id())){
+            holder.delete_image.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -91,6 +97,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         private final TextView post;
         private final TextView likes_count;
         private final ImageView like_image;
+        private final ImageView delete_image;
         private final ImageView comment_image;
         private final TextView comment_count;
 
@@ -109,10 +116,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             comment_image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.container, new CommentFragment()).commit();
                     Toast.makeText(comment_image.getContext(), "comment clicked", Toast.LENGTH_SHORT).show();
                 }
             });
+
 
             like_image = itemView.findViewById(R.id.like_image);
             like_image.setOnClickListener(new View.OnClickListener() {
@@ -132,6 +139,46 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                             });
                 }
             });
+
+            delete_image = itemView.findViewById(R.id.delete_img);
+            delete_image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(delete_image.getContext());
+                    builder.setMessage("Are you sure you want to delete this post?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Call<Void> call = jsonData.deletePost(_id.getText().toString());
+                                    call.enqueue(new Callback<Void>() {
+                                        @Override
+                                        public void onResponse(Call<Void> call, Response<Void> response) {
+                                            Toast.makeText(delete_image.getContext(), "Post deleted", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Void> call, Throwable t) {
+
+                                        }
+                                    });
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.cancel();
+                                }
+                            });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                }
+            });
+
+
         }
         }
+
+
 }

@@ -5,16 +5,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 //import android.widget.SearchView;
 import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +37,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 //BottomNavigationView.OnNavigationItemSelectedListener
 public class MainActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener {
-    BottomNavigationView bottomNavigationView;
+    private static BottomNavigationView bottomNavigationView;
+
+    public static BottomNavigationView getBottomNavigationView() { return bottomNavigationView;}
+
     TextView txterror;
     private JsonData jsonData;
     RecyclerView postRV;
@@ -107,8 +115,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         switch (item.getItemId()){
             case R.id.home:
-//                Intent intent = new Intent(this, MainActivity.class);
-//                startActivity(intent);
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, homeFragment).commit();
                 return true;
             case R.id.post:
@@ -156,6 +162,21 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 return true;
             }
         });
+
+        MenuItem menuItem1 = menu.findItem(R.id.log_out);
+        menuItem1.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if(menuItem.getItemId()== R.id.log_out){
+                    LoginActivity.logOut();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
+                return false;
+            }
+        });
+
+
 
         return super.onCreateOptionsMenu(menu);
     }

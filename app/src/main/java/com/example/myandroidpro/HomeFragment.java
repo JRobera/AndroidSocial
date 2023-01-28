@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
                 txt_error.setVisibility(View.VISIBLE);
                 txt_error.setText(t.getMessage());
                 Log.d("TAG","Response "+t.toString());
-                Toast.makeText(getContext(), "failure", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Post failure", Toast.LENGTH_SHORT).show();
             }
         });
 

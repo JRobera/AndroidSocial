@@ -2,11 +2,13 @@ package com.example.myandroidpro;
 
 import static android.text.TextUtils.isEmpty;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -41,8 +43,6 @@ public class JobPostFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         job_title = view.findViewById(R.id.job_title);
         job_description = view.findViewById(R.id.job_description);
-        job_description.setVerticalScrollBarEnabled(true);
-        job_description.setScrollbarFadingEnabled(true);
         job_requirements = view.findViewById(R.id.job_requirements);
         job_salary = view.findViewById(R.id.job_salary);
         job_location = view.findViewById(R.id.job_location);
@@ -85,7 +85,7 @@ public class JobPostFragment extends Fragment {
             public void onClick(View view) {
                 if(!isEmpty(job_title.getText()) && !isEmpty(job_description.getText()) && !isEmpty(job_requirements.getText())){
 
-                Call<JobModel> call = jsonData.createJobPost(job_title.getText().toString(),job_description.getText().toString(),job_requirements.getText().toString(),job_salary.getText().toString(),job_location.getText().toString());
+                Call<JobModel> call = jsonData.createJobPost(LoginActivity.getUser_id(),job_title.getText().toString(),job_description.getText().toString(),job_requirements.getText().toString(),job_salary.getText().toString(),job_location.getText().toString());
                 call.enqueue(new Callback<JobModel>() {
                     @Override
                     public void onResponse(Call<JobModel> call, Response<JobModel> response) {
@@ -108,13 +108,17 @@ public class JobPostFragment extends Fragment {
                 FragmentTransaction fragmentTransaction1 = fragmentManager1.beginTransaction();
                 fragmentTransaction1.replace(R.id.container, new JobFragment());
                 fragmentTransaction1.commit();
-//                bottomNavigationView.setSelectedItemId(R.id.job);
+               MainActivity.getBottomNavigationView().setSelectedItemId(R.id.job);
+                InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(btn_post_job.getWindowToken(), 0);
+
 
 
             }
         });
 
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

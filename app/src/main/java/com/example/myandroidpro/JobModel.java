@@ -3,6 +3,8 @@ package com.example.myandroidpro;
 import java.util.Date;
 
 public class JobModel {
+    private String _id;
+    private String author;
     private String title;
     private String description;
     private String requirements;
@@ -10,7 +12,9 @@ public class JobModel {
     private String location;
     private Date posted_date;
 
-    public JobModel(String title, String description, String requirements, int salary, String location,Date posted_date) {
+    public JobModel(String _id,String author,String title, String description, String requirements, int salary, String location,Date posted_date) {
+        this._id = _id;
+        this.author = author;
         this.title = title;
         this.description = description;
         this.requirements = requirements;
@@ -18,6 +22,12 @@ public class JobModel {
         this.location = location;
         this.posted_date = posted_date;
     }
+
+    public String get_id() { return _id; }
+
+    public void set_id(String _id) { this._id = _id;  }
+
+    public String getAuthor() { return author; }
 
     public String getLocation() {
         return location;

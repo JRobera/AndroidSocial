@@ -1,5 +1,8 @@
 package com.example.myandroidpro;
 
+import static android.text.TextUtils.isEmpty;
+
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -13,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -41,8 +45,6 @@ private Button btn_post;
         super.onViewCreated(view, savedInstanceState);
         ed_title = view.findViewById(R.id.ed_title);
         ed_post = view.findViewById(R.id.ed_post);
-        ed_post.setVerticalScrollBarEnabled(true);
-        ed_post.setScrollbarFadingEnabled(true);
         btn_post = view.findViewById(R.id.btn_post);
 
         bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
@@ -82,16 +84,20 @@ private Button btn_post;
         btn_post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Call<PostModel> call= jsonData.createPost(ed_title.getText().toString(),ed_post.getText().toString(),LoginActivity.getUser_id());
+                if (!isEmpty(ed_title.getText().toString()) && !isEmpty(ed_post.getText().toString())) {
+
+                Call<PostModel> call = jsonData.createPost(ed_title.getText().toString(), ed_post.getText().toString(), LoginActivity.getUser_id());
                 call.enqueue(new Callback<PostModel>() {
                     @Override
                     public void onResponse(Call<PostModel> call, Response<PostModel> response) {
-                        if(!response.isSuccessful()){
+                        if (!response.isSuccessful()) {
                             return;
                         }
                     }
+
                     @Override
-                    public void onFailure(Call<PostModel> call, Throwable t) { }
+                    public void onFailure(Call<PostModel> call, Throwable t) {
+                    }
                 });
                 ed_title.setText("");
                 ed_post.setText("");
@@ -99,9 +105,12 @@ private Button btn_post;
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.container, new HomeFragment());
                 fragmentTransaction.commit();
-//                bottomNavigationView.setSelectedItemId(R.id.job);
+                    MainActivity.getBottomNavigationView().setSelectedItemId(R.id.home);
+                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(btn_post.getWindowToken(), 0);
 
-            }
+                }
+        }
         });
 
     }
